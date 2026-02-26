@@ -10,7 +10,8 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/node": "^25.3.1"
   },
   "peerDependencies": {
     "typescript": "^5"
