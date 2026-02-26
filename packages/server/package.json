@@ -1,6 +1,6 @@
 {
   "name": "@typeorm-studio/server",
-  "module": "src/index.ts",
+  "module": "src/studio.ts",
   "type": "module",
   "scripts": {
     "dev": "bun run --watch src/index.ts"
@@ -9,6 +9,12 @@
     "@types/bun": "latest"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "typeorm": ">=0.3.0"
+  },
+  "peerDependenciesMeta": {
+    "typeorm": {
+      "optional": true
+    }
   }
 }
