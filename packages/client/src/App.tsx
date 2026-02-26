@@ -9,6 +9,7 @@ import { StudioLayout } from "@/components/layout/studio-layout"
 import { ModelDataView } from "@/components/models/model-data-view"
 import { ModelHome } from "@/components/models/model-home"
 import { ModelVisualizeView } from "@/components/visualize/model-visualize-view"
+import { StudioProvider } from "@/providers/studio-provider"
 
 const rootRoute = createRootRoute({
   component: StudioLayout,
@@ -46,7 +47,11 @@ declare module "@tanstack/react-router" {
 }
 
 function App() {
-  return <RouterProvider router={router} />
+  return (
+    <StudioProvider>
+      <RouterProvider router={router} />
+    </StudioProvider>
+  )
 }
 
 export default App

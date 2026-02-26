@@ -66,6 +66,12 @@ export function createStudioHandler(rawConfig: StudioApiConfig) {
         return json(schema, { headers: cors });
       }
 
+      if (internalPath.startsWith("/models/") && internalPath.endsWith("/shape")) {
+        const tableName = getTableName(internalPath);
+        const shape = await config.provider.getModelShape(tableName);
+        return json(shape, { headers: cors });
+      }
+
       if (internalPath.startsWith("/models/") && internalPath.endsWith("/rows")) {
         const tableName = getTableName(internalPath);
         const limit = parsePositiveInt(url.searchParams.get("limit"), 50, "limit");

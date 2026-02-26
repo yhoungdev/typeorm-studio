@@ -37,7 +37,7 @@ interface RepositoryLike {
   }): Promise<Record<string, unknown>[]>;
 }
 
-interface DataSourceLike {
+export interface TypeOrmDataSourceLike {
   isInitialized: boolean;
   initialize(): Promise<void>;
   entityMetadatas: EntityMetadataLike[];
@@ -45,7 +45,7 @@ interface DataSourceLike {
 }
 
 export interface TypeOrmProviderConfig {
-  dataSource: DataSourceLike;
+  dataSource: TypeOrmDataSourceLike;
   defaultLimit?: number;
   maxLimit?: number;
 }
@@ -171,6 +171,10 @@ export function createTypeOrmProvider(config: TypeOrmProviderConfig): StudioProv
       return {
         models: config.dataSource.entityMetadatas.map(normalizeModel),
       };
+    },
+    async getModelShape(tableName: string): Promise<StudioModel> {
+      await ensureDataSource();
+      return normalizeModel(getMetadata(tableName));
     },
 
     async listRows(tableName: string, options: ListRowsOptions): Promise<ListRowsResult> {

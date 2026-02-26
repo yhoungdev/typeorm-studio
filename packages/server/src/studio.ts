@@ -1,8 +1,8 @@
 export { createStudioHandler } from "./core/handler";
 export { startStudioServer } from "./core/server";
 
-export { createInMemoryProvider } from "./adapters/in-memory";
 export { createTypeOrmProvider } from "./adapters/typeorm";
+export { loadDataSource } from "./typeorm-loader";
 
 export type {
   StudioColumn,
@@ -22,5 +22,6 @@ export type {
   ResolvedStudioApiConfig,
 } from "./core/config";
 
-export type { InMemoryDataset } from "./adapters/in-memory";
 export type { TypeOrmProviderConfig } from "./adapters/typeorm";
+export type { LoadDataSourceOptions } from "./typeorm-loader";
+export type { TypeOrmDataSourceLike } from "./adapters/typeorm";

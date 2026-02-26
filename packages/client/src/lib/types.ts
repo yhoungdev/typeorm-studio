@@ -1,15 +1,6 @@
-export type ColumnType =
-  | 'uuid'
-  | 'varchar'
-  | 'text'
-  | 'boolean'
-  | 'int'
-  | 'decimal'
-  | 'timestamp'
-
 export interface ModelColumn {
   name: string
-  type: ColumnType
+  type: string
   isPrimary?: boolean
   nullable?: boolean
 }
@@ -26,9 +17,15 @@ export interface StudioModel {
   relations: ModelRelation[]
 }
 
-export type ModelRow = Record<string, string | number | boolean | null>
+export type ModelRow = Record<string, unknown>
 
-export interface StudioDataset {
+export interface StudioSchema {
   models: StudioModel[]
-  rows: Record<string, ModelRow[]>
+}
+
+export interface ListRowsResponse {
+  rows: ModelRow[]
+  total: number
+  limit: number
+  offset: number
 }

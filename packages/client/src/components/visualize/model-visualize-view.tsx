@@ -3,9 +3,11 @@ import { Background, Controls, MiniMap, ReactFlow } from "@xyflow/react"
 import type { Edge, Node } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 
-import { models, relationTargetModel } from "@/lib/studio"
+import { relationTargetModel } from "@/lib/studio"
+import type { StudioModel } from "@/lib/types"
+import { useStudio } from "@/providers/studio-provider"
 
-function createNodes(): Node[] {
+function createNodes(models: StudioModel[]): Node[] {
   return models.map((model, index) => ({
     id: model.tableName,
     position: {
@@ -31,7 +33,7 @@ function createNodes(): Node[] {
   }))
 }
 
-function createEdges(): Edge[] {
+function createEdges(models: StudioModel[]): Edge[] {
   const edges: Edge[] = []
 
   for (const model of models) {
@@ -56,8 +58,18 @@ function createEdges(): Edge[] {
 }
 
 export function ModelVisualizeView() {
-  const nodes = useMemo(() => createNodes(), [])
-  const edges = useMemo(() => createEdges(), [])
+  const { models, isLoading, error } = useStudio()
+
+  const nodes = useMemo(() => createNodes(models), [models])
+  const edges = useMemo(() => createEdges(models), [models])
+
+  if (isLoading) {
+    return <div className="rounded-lg border p-6 text-sm text-muted-foreground">Loading schema...</div>
+  }
+
+  if (error) {
+    return <div className="rounded-lg border p-6 text-sm text-destructive">{error}</div>
+  }
 
   return (
     <div className="space-y-4">

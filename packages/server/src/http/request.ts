@@ -31,10 +31,15 @@ export function parsePositiveInt(
 }
 
 export function getTableName(pathname: string): string {
-  const match = pathname.match(/^\/models\/([^/]+)\/rows\/?$/);
-  if (!match?.[1]) {
-    throw new HttpError(404, "Route not found");
+  const rowsMatch = pathname.match(/^\/models\/([^/]+)\/rows\/?$/);
+  if (rowsMatch?.[1]) {
+    return decodeURIComponent(rowsMatch[1]);
   }
 
-  return decodeURIComponent(match[1]);
+  const shapeMatch = pathname.match(/^\/models\/([^/]+)\/shape\/?$/);
+  if (shapeMatch?.[1]) {
+    return decodeURIComponent(shapeMatch[1]);
+  }
+
+  throw new HttpError(404, "Route not found");
 }

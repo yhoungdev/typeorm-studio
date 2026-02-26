@@ -1,16 +1,19 @@
 import { useMemo, useState } from "react"
 import { Link, Outlet } from "@tanstack/react-router"
-import { CircleCheckBig, Database, Table2 } from "lucide-react"
+import { CircleAlert, CircleCheckBig, Database, LoaderCircle, Table2 } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
-import { filterByTerm, getRowsByTable, models } from "@/lib/studio"
+import { Skeleton } from "@/components/ui/skeleton"
+import { filterByTerm } from "@/lib/studio"
+import { useStudio } from "@/providers/studio-provider"
 
 export function StudioLayout() {
   const [query, setQuery] = useState("")
+  const { models, isLoading, connected, error } = useStudio()
 
   const filteredModels = useMemo(
     () => filterByTerm(models, (model) => model.tableName, query),
-    [query],
+    [models, query],
   )
 
   return (
@@ -40,8 +43,10 @@ export function StudioLayout() {
           </div>
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <CircleCheckBig className="size-3.5" />
-          Connected
+          {isLoading && <LoaderCircle className="size-3.5 animate-spin" />}
+          {!isLoading && connected && <CircleCheckBig className="size-3.5" />}
+          {!isLoading && !connected && <CircleAlert className="size-3.5" />}
+          {isLoading ? "Connecting" : connected ? "Connected" : "Disconnected"}
         </div>
       </header>
 
@@ -53,23 +58,40 @@ export function StudioLayout() {
             placeholder="Search models"
             className="mb-3"
           />
-          <div className="space-y-1">
-            {filteredModels.map((model) => (
-              <Link
-                key={model.tableName}
-                to="/models/$modelName"
-                params={{ modelName: model.tableName }}
-                className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted"
-                activeProps={{ className: "bg-muted font-medium" }}
-              >
-                <span className="flex items-center gap-2">
-                  <Table2 className="size-3.5" />
-                  {model.tableName}
-                </span>
-                <span className="text-xs text-muted-foreground">{getRowsByTable(model.tableName).length}</span>
-              </Link>
-            ))}
-          </div>
+
+          {isLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-9" />
+              <Skeleton className="h-9" />
+              <Skeleton className="h-9" />
+            </div>
+          ) : null}
+
+          {!isLoading && error ? (
+            <div className="rounded-md border border-destructive/40 bg-destructive/5 p-2 text-xs text-destructive">
+              {error}
+            </div>
+          ) : null}
+
+          {!isLoading && !error ? (
+            <div className="space-y-1">
+              {filteredModels.map((model) => (
+                <Link
+                  key={model.tableName}
+                  to="/models/$modelName"
+                  params={{ modelName: model.tableName }}
+                  className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted"
+                  activeProps={{ className: "bg-muted font-medium" }}
+                >
+                  <span className="flex items-center gap-2">
+                    <Table2 className="size-3.5" />
+                    {model.tableName}
+                  </span>
+                  <span className="text-xs text-muted-foreground">{model.columns.length} cols</span>
+                </Link>
+              ))}
+            </div>
+          ) : null}
         </aside>
 
         <main className="overflow-auto p-4">
