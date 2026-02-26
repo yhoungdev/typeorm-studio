@@ -1,0 +1,21 @@
+{
+  "name": "typeorm-studio",
+  "private": true,
+  "scripts": {
+    "dev": "bun run index.ts",
+    "dev:client": "npm run --workspace packages/client dev",
+    "dev:server": "npm run --workspace packages/server dev"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@xyflow/react": "^12.10.1"
+  }
+}
