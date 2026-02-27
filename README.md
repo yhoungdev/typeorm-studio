@@ -8,21 +8,30 @@ bun install
 
 ## Run with a real TypeORM DataSource
 
-Set your app data-source path before starting dev:
+Configure env vars, then run dev.
+
+1. Copy env template:
 
 ```bash
-TYPEORM_DATA_SOURCE_PATH=../your-app/src/data-source.ts \
-TYPEORM_DATA_SOURCE_EXPORT=AppDataSource \
+cp packages/server/.env.example .env
+```
+
+2. Update `.env` values (`TYPEORM_DATA_SOURCE_PATH`, `TYPEORM_DATA_SOURCE_EXPORT`, and your `DATABASE_URL`).
+
+3. Start:
+
+```bash
 bun run dev
 ```
 
 - Client UI: `http://127.0.0.1:5173`
 - Server API: `http://127.0.0.1:3000/api`
 
-If you have port conflicts, run with custom ports:
+If you have port conflicts, set custom ports in `.env`:
 
 ```bash
-PORT=3001 CLIENT_PORT=5174 TYPEORM_DATA_SOURCE_PATH=../your-app/src/data-source.ts bun run dev
+PORT=3001
+CLIENT_PORT=5174
 ```
 
 NB: This is still a work in progress.

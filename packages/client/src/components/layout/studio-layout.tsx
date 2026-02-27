@@ -54,7 +54,7 @@ export function StudioLayout() {
             </Link>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground ">
           {isLoading && <LoaderCircle className="size-3.5 animate-spin" />}
           {!isLoading && connected && <CircleCheckBig className="size-3.5" />}
           {!isLoading && !connected && <CircleAlert className="size-3.5" />}
