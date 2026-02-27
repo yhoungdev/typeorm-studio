@@ -3,7 +3,6 @@
   "private": true,
   "scripts": {
     "dev": "bun run index.ts",
-    "dev:app": "bun run index.ts",
     "format": "prettier --write .",
     "dev:client": "npm run --workspace packages/client dev",
     "dev:server": "npm run --workspace packages/server dev",
