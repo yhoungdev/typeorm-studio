@@ -5,7 +5,8 @@ const port = Number(process.env.PORT ?? 3000);
 const clientOrigin = process.env.CLIENT_ORIGIN ?? "http://localhost:5173";
 
 const dataSourcePath = process.env.TYPEORM_DATA_SOURCE_PATH;
-const dataSourceExportName = process.env.TYPEORM_DATA_SOURCE_EXPORT ?? "AppDataSource";
+const dataSourceExportName =
+  process.env.TYPEORM_DATA_SOURCE_EXPORT ?? "AppDataSource";
 
 if (!dataSourcePath) {
   throw new Error(

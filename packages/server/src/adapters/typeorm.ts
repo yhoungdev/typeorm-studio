@@ -14,7 +14,7 @@ interface EntityMetadataLike {
   tableName: string;
   columns: Array<{
     propertyName: string;
-    type: string | Function;
+    type: string | { name: string };
     isPrimary: boolean;
     isNullable: boolean;
   }>;
@@ -50,7 +50,7 @@ export interface TypeOrmProviderConfig {
   maxLimit?: number;
 }
 
-function toColumnType(rawType: string | Function): string {
+function toColumnType(rawType: string | { name: string }): string {
   if (typeof rawType === "string") {
     return rawType;
   }
@@ -80,7 +80,11 @@ function normalizeModel(meta: EntityMetadataLike): StudioModel {
   };
 }
 
-function resolveLimit(limit: number | undefined, defaultLimit: number, maxLimit: number): number {
+function resolveLimit(
+  limit: number | undefined,
+  defaultLimit: number,
+  maxLimit: number,
+): number {
   const requested = limit ?? defaultLimit;
   if (requested <= 0) {
     throw new HttpError(400, "limit must be greater than 0");
@@ -88,11 +92,15 @@ function resolveLimit(limit: number | undefined, defaultLimit: number, maxLimit:
   return Math.min(requested, maxLimit);
 }
 
-export function createTypeOrmProvider(config: TypeOrmProviderConfig): StudioProvider {
+export function createTypeOrmProvider(
+  config: TypeOrmProviderConfig,
+): StudioProvider {
   const defaultLimit = config.defaultLimit ?? 50;
   const maxLimit = config.maxLimit ?? 200;
-  let typeormOps: { ILike?: (value: string) => unknown; Like?: (value: string) => unknown } | null =
-    null;
+  let typeormOps: {
+    ILike?: (value: string) => unknown;
+    Like?: (value: string) => unknown;
+  } | null = null;
   let typeormOpsResolved = false;
 
   async function ensureDataSource() {
@@ -177,7 +185,10 @@ export function createTypeOrmProvider(config: TypeOrmProviderConfig): StudioProv
       return normalizeModel(getMetadata(tableName));
     },
 
-    async listRows(tableName: string, options: ListRowsOptions): Promise<ListRowsResult> {
+    async listRows(
+      tableName: string,
+      options: ListRowsOptions,
+    ): Promise<ListRowsResult> {
       await ensureDataSource();
       const metadata = getMetadata(tableName);
       const repository = config.dataSource.getRepository(metadata.name);

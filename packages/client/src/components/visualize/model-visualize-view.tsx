@@ -1,11 +1,11 @@
-import { useMemo } from "react"
-import { Background, Controls, MiniMap, ReactFlow } from "@xyflow/react"
-import type { Edge, Node } from "@xyflow/react"
-import "@xyflow/react/dist/style.css"
+import { useMemo } from "react";
+import { Background, Controls, MiniMap, ReactFlow } from "@xyflow/react";
+import type { Edge, Node } from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 
-import { relationTargetModel } from "@/lib/studio"
-import type { StudioModel } from "@/lib/types"
-import { useStudio } from "@/providers/studio-provider"
+import { relationTargetModel } from "@/lib/studio";
+import type { StudioModel } from "@/lib/types";
+import { useStudio } from "@/providers/studio-provider";
 
 function createNodes(models: StudioModel[]): Node[] {
   return models.map((model, index) => ({
@@ -30,18 +30,18 @@ function createNodes(models: StudioModel[]): Node[] {
       ),
     },
     type: "default",
-  }))
+  }));
 }
 
 function createEdges(models: StudioModel[]): Edge[] {
-  const edges: Edge[] = []
+  const edges: Edge[] = [];
 
   for (const model of models) {
     for (const relation of model.relations) {
-      const target = relationTargetModel(relation.references)
+      const target = relationTargetModel(relation.references);
 
       if (!target) {
-        continue
+        continue;
       }
 
       edges.push({
@@ -50,32 +50,42 @@ function createEdges(models: StudioModel[]): Edge[] {
         target,
         label: relation.field,
         animated: true,
-      })
+      });
     }
   }
 
-  return edges
+  return edges;
 }
 
 export function ModelVisualizeView() {
-  const { models, isLoading, error } = useStudio()
+  const { models, isLoading, error } = useStudio();
 
-  const nodes = useMemo(() => createNodes(models), [models])
-  const edges = useMemo(() => createEdges(models), [models])
+  const nodes = useMemo(() => createNodes(models), [models]);
+  const edges = useMemo(() => createEdges(models), [models]);
 
   if (isLoading) {
-    return <div className="rounded-lg border p-6 text-sm text-muted-foreground">Loading schema...</div>
+    return (
+      <div className="rounded-lg border p-6 text-sm text-muted-foreground">
+        Loading schema...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="rounded-lg border p-6 text-sm text-destructive">{error}</div>
+    return (
+      <div className="rounded-lg border p-6 text-sm text-destructive">
+        {error}
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4">
       <div>
         <h1 className="text-xl font-semibold">Visualize</h1>
-        <p className="text-sm text-muted-foreground">Relationship map of your TypeORM models.</p>
+        <p className="text-sm text-muted-foreground">
+          Relationship map of your TypeORM models.
+        </p>
       </div>
 
       <div className="h-[72vh] overflow-hidden rounded-lg border">
@@ -86,5 +96,5 @@ export function ModelVisualizeView() {
         </ReactFlow>
       </div>
     </div>
-  )
+  );
 }

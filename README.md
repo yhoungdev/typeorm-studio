@@ -28,3 +28,7 @@ PORT=3001 CLIENT_PORT=5174 TYPEORM_DATA_SOURCE_PATH=../your-app/src/data-source.
 NB: This is still a work in progress.
 
 This project was created using `bun init` in bun v1.2.5. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+
+## Contributing
+
+- Contribution guide and maintainer list: `CONTRIBUTORS.md`

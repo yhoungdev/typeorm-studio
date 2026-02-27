@@ -26,10 +26,39 @@ Environment variables:
 - `STUDIO_DEFAULT_LIMIT` (optional): rows page size default, default `50`
 - `STUDIO_MAX_LIMIT` (optional): max rows page size, default `200`
 
+## Test in your application
+
+1. Ensure your TypeORM app starts and can initialize `AppDataSource`.
+2. From this repo, point studio server to your app data source:
+
+```bash
+TYPEORM_DATA_SOURCE_PATH=../your-app/src/data-source.ts \
+TYPEORM_DATA_SOURCE_EXPORT=AppDataSource \
+PORT=3000 bun run --cwd packages/server dev
+```
+
+3. Validate API connectivity and model metadata:
+
+```bash
+curl http://127.0.0.1:3000/api/health
+curl http://127.0.0.1:3000/api/schema
+curl http://127.0.0.1:3000/api/models/<table_name>/shape
+curl "http://127.0.0.1:3000/api/models/<table_name>/rows?limit=20"
+```
+
+4. Run client against this backend:
+
+```bash
+bun run dev
+```
+
 ## Mount in host app
 
 ```ts
-import { createStudioHandler, createTypeOrmProvider } from "@typeorm-studio/server";
+import {
+  createStudioHandler,
+  createTypeOrmProvider,
+} from "@typeorm-studio/server";
 import { AppDataSource } from "./data-source";
 
 const studioHandler = createStudioHandler({

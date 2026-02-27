@@ -20,7 +20,9 @@ export interface LoadDataSourceOptions {
   exportName: string;
 }
 
-export async function loadDataSource(options: LoadDataSourceOptions): Promise<TypeOrmDataSourceLike> {
+export async function loadDataSource(
+  options: LoadDataSourceOptions,
+): Promise<TypeOrmDataSourceLike> {
   const absolutePath = resolve(process.cwd(), options.modulePath);
   const moduleUrl = pathToFileURL(absolutePath).href;
   const loadedModule = (await import(moduleUrl)) as Record<string, unknown>;

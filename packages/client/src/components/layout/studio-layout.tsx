@@ -1,20 +1,26 @@
-import { useMemo, useState } from "react"
-import { Link, Outlet } from "@tanstack/react-router"
-import { CircleAlert, CircleCheckBig, Database, LoaderCircle, Table2 } from "lucide-react"
+import { useMemo, useState } from "react";
+import { Link, Outlet } from "@tanstack/react-router";
+import {
+  CircleAlert,
+  CircleCheckBig,
+  Database,
+  LoaderCircle,
+  Table2,
+} from "lucide-react";
 
-import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
-import { filterByTerm } from "@/lib/studio"
-import { useStudio } from "@/providers/studio-provider"
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { filterByTerm } from "@/lib/studio";
+import { useStudio } from "@/providers/studio-provider";
 
 export function StudioLayout() {
-  const [query, setQuery] = useState("")
-  const { models, isLoading, connected, error } = useStudio()
+  const [query, setQuery] = useState("");
+  const { models, isLoading, connected, error } = useStudio();
 
   const filteredModels = useMemo(
     () => filterByTerm(models, (model) => model.tableName, query),
     [models, query],
-  )
+  );
 
   return (
     <div className="h-screen overflow-hidden bg-background text-foreground">
@@ -28,7 +34,10 @@ export function StudioLayout() {
             <Link
               to="/"
               className="rounded-sm px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
-              activeProps={{ className: "rounded-sm bg-muted px-2 py-1 text-xs text-foreground" }}
+              activeProps={{
+                className:
+                  "rounded-sm bg-muted px-2 py-1 text-xs text-foreground",
+              }}
               activeOptions={{ exact: false, includeSearch: false }}
             >
               Data
@@ -36,7 +45,10 @@ export function StudioLayout() {
             <Link
               to="/visualize"
               className="rounded-sm px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
-              activeProps={{ className: "rounded-sm bg-muted px-2 py-1 text-xs text-foreground" }}
+              activeProps={{
+                className:
+                  "rounded-sm bg-muted px-2 py-1 text-xs text-foreground",
+              }}
             >
               Visualize
             </Link>
@@ -87,7 +99,9 @@ export function StudioLayout() {
                     <Table2 className="size-3.5" />
                     {model.tableName}
                   </span>
-                  <span className="text-xs text-muted-foreground">{model.columns.length} cols</span>
+                  <span className="text-xs text-muted-foreground">
+                    {model.columns.length} cols
+                  </span>
                 </Link>
               ))}
             </div>
@@ -99,5 +113,5 @@ export function StudioLayout() {
         </main>
       </div>
     </div>
-  )
+  );
 }
