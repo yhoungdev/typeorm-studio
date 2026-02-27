@@ -38,5 +38,9 @@ export interface ListRowsResult {
 
 export interface StudioProvider {
   getSchema(): Promise<StudioSchema>;
-  listRows(tableName: string, options: ListRowsOptions): Promise<ListRowsResult>;
+  getModelShape(tableName: string): Promise<StudioModel>;
+  listRows(
+    tableName: string,
+    options: ListRowsOptions,
+  ): Promise<ListRowsResult>;
 }

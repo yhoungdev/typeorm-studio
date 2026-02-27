@@ -3,18 +3,20 @@
   "module": "src/studio.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "lint": "eslint src --ext .ts --max-warnings=0",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "typecheck": "tsc -p tsconfig.json --pretty false"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@eslint/js": "^9.39.1",
+    "@types/bun": "latest",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "typescript-eslint": "^8.48.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0",
     "typeorm": ">=0.3.0"
-  },
-  "peerDependenciesMeta": {
-    "typeorm": {
-      "optional": true
-    }
   }
 }

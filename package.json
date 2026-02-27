@@ -3,8 +3,12 @@
   "private": true,
   "scripts": {
     "dev": "bun run index.ts",
+    "format": "prettier --write .",
     "dev:client": "npm run --workspace packages/client dev",
-    "dev:server": "npm run --workspace packages/server dev"
+    "dev:server": "npm run --workspace packages/server dev",
+    "lint": "npm run --workspace packages/client lint && npm run --workspace packages/server lint",
+    "lint:fix": "npm run --workspace packages/client lint:fix && npm run --workspace packages/server lint:fix",
+    "typecheck": "npm run --workspace packages/client typecheck && npm run --workspace packages/server typecheck"
   },
   "workspaces": [
     "packages/*"
@@ -17,6 +21,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@xyflow/react": "^12.10.1"
+    "@xyflow/react": "^12.10.1",
+    "prettier": "^3.8.1"
   }
 }

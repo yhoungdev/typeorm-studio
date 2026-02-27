@@ -66,10 +66,30 @@ export function createStudioHandler(rawConfig: StudioApiConfig) {
         return json(schema, { headers: cors });
       }
 
-      if (internalPath.startsWith("/models/") && internalPath.endsWith("/rows")) {
+      if (
+        internalPath.startsWith("/models/") &&
+        internalPath.endsWith("/shape")
+      ) {
         const tableName = getTableName(internalPath);
-        const limit = parsePositiveInt(url.searchParams.get("limit"), 50, "limit");
-        const offset = parsePositiveInt(url.searchParams.get("offset"), 0, "offset");
+        const shape = await config.provider.getModelShape(tableName);
+        return json(shape, { headers: cors });
+      }
+
+      if (
+        internalPath.startsWith("/models/") &&
+        internalPath.endsWith("/rows")
+      ) {
+        const tableName = getTableName(internalPath);
+        const limit = parsePositiveInt(
+          url.searchParams.get("limit"),
+          50,
+          "limit",
+        );
+        const offset = parsePositiveInt(
+          url.searchParams.get("offset"),
+          0,
+          "offset",
+        );
         const search = url.searchParams.get("search") ?? "";
 
         const payload = await config.provider.listRows(tableName, {

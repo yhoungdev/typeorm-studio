@@ -15,7 +15,10 @@ function canBindPort(port: number, host: string): Promise<boolean> {
   });
 }
 
-async function findOpenPort(startPort: number, host: string): Promise<number | null> {
+async function findOpenPort(
+  startPort: number,
+  host: string,
+): Promise<number | null> {
   for (let port = startPort; port < startPort + 25; port++) {
     if (await canBindPort(port, host)) {
       return port;
@@ -24,8 +27,10 @@ async function findOpenPort(startPort: number, host: string): Promise<number | n
   return null;
 }
 
-const serverPort = (await findOpenPort(requestedServerPort, "127.0.0.1")) ?? requestedServerPort;
-const clientPort = (await findOpenPort(requestedClientPort, clientHost)) ?? requestedClientPort;
+const serverPort =
+  (await findOpenPort(requestedServerPort, "127.0.0.1")) ?? requestedServerPort;
+const clientPort =
+  (await findOpenPort(requestedClientPort, clientHost)) ?? requestedClientPort;
 
 const commands = [
   {

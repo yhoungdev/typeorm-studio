@@ -25,7 +25,9 @@ export interface ResolvedStudioApiConfig {
   proxy: Required<ProxyConfig>;
 }
 
-export function resolveConfig(config: StudioApiConfig): ResolvedStudioApiConfig {
+export function resolveConfig(
+  config: StudioApiConfig,
+): ResolvedStudioApiConfig {
   return {
     provider: config.provider,
     apiPrefix: config.apiPrefix ?? "/api",
@@ -41,7 +43,9 @@ export function resolveConfig(config: StudioApiConfig): ResolvedStudioApiConfig 
   };
 }
 
-export function corsHeaders(config: ResolvedStudioApiConfig): Record<string, string> {
+export function corsHeaders(
+  config: ResolvedStudioApiConfig,
+): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": config.cors.origin,
     "Access-Control-Allow-Methods": config.cors.methods,
