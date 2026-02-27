@@ -1,8 +1,35 @@
 import { createServer } from "node:net";
 
+function getCliArg(flag: string): string | undefined {
+  const args = Bun.argv.slice(2);
+  const index = args.findIndex((arg) => arg === flag);
+  if (index < 0) {
+    return undefined;
+  }
+
+  const value = args[index + 1];
+  if (!value || value.startsWith("--")) {
+    return undefined;
+  }
+
+  return value;
+}
+
 const requestedServerPort = Number(process.env.PORT ?? "3000");
 const requestedClientPort = Number(process.env.CLIENT_PORT ?? "5173");
 const clientHost = process.env.CLIENT_HOST ?? "127.0.0.1";
+const dataSourcePath =
+  getCliArg("--ds") ?? process.env.TYPEORM_DATA_SOURCE_PATH;
+const dataSourceExport =
+  getCliArg("--export") ?? process.env.TYPEORM_DATA_SOURCE_EXPORT;
+
+if (!dataSourcePath) {
+  console.error("Missing DataSource path.");
+  console.error(
+    "Run with: bun run dev:app -- --ds ../your-app/src/data-source.ts",
+  );
+  process.exit(1);
+}
 
 function canBindPort(port: number, host: string): Promise<boolean> {
   return new Promise((resolve) => {
@@ -40,6 +67,10 @@ const commands = [
       ...process.env,
       PORT: String(serverPort),
       CLIENT_ORIGIN: `http://${clientHost}:${clientPort}`,
+      TYPEORM_DATA_SOURCE_PATH: dataSourcePath,
+      ...(dataSourceExport
+        ? { TYPEORM_DATA_SOURCE_EXPORT: dataSourceExport }
+        : {}),
     },
   },
   {
@@ -95,6 +126,9 @@ process.on("SIGINT", () => {
 console.log("TypeORM Studio");
 console.log(`Client: http://${clientHost}:${clientPort}`);
 console.log(`Server/API: http://127.0.0.1:${serverPort}/api`);
+console.log(
+  `DataSource: ${dataSourcePath}${dataSourceExport ? `#${dataSourceExport}` : "#AppDataSource"}`,
+);
 if (serverPort !== requestedServerPort || clientPort !== requestedClientPort) {
   console.log(
     `Requested ports were busy. Using server=${serverPort}, client=${clientPort}`,

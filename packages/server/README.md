@@ -49,7 +49,7 @@ curl "http://127.0.0.1:3000/api/models/<table_name>/rows?limit=20"
 4. Run client against this backend:
 
 ```bash
-bun run dev
+bun run dev:app -- --ds ../your-app/src/data-source.ts --export AppDataSource
 ```
 
 ## Mount in host app
