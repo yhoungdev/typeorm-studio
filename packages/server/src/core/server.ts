@@ -7,10 +7,27 @@ export interface StudioServerConfig extends StudioApiConfig {
 
 export function startStudioServer(config: StudioServerConfig) {
   const handler = createStudioHandler(config);
-  const server = Bun.serve({
-    port: config.port ?? Number(process.env.PORT ?? 3000),
-    fetch: handler,
-  });
+  let port = config.port ?? Number(process.env.PORT ?? 3000);
+  const maxAttempts = 10;
+  let attempts = 0;
 
-  return server;
+  while (attempts < maxAttempts) {
+    try {
+      const server = Bun.serve({
+        port,
+        fetch: handler,
+      });
+      return server;
+    } catch (e: any) {
+      if (e.code === "EADDRINUSE" || e.message?.includes("address already in use")) {
+        console.warn(`Port ${port} is in use, trying ${port + 1}...`);
+        port++;
+        attempts++;
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  throw new Error(`Could not find an available port after ${maxAttempts} attempts.`);
 }

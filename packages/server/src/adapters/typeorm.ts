@@ -207,6 +207,13 @@ export function createTypeOrmProvider(
         }),
       ]);
 
+      console.log(`[Studio] Adapter found ${rows.length} rows (Total: ${total}) for table: ${tableName}`);
+      if (rows.length > 0) {
+        console.log(`[Studio] First row sample:`, JSON.stringify(rows[0], null, 2));
+      } else {
+        console.log(`[Studio] No rows returned from repository for table: ${tableName}`);
+      }
+
       return {
         rows,
         total,

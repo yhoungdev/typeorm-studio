@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { createTypeOrmProvider, startStudioServer } from "./studio";
 import { loadDataSource } from "./typeorm-loader";
 
@@ -17,6 +18,16 @@ if (!dataSourcePath) {
 const dataSource = await loadDataSource({
   modulePath: dataSourcePath,
   exportName: dataSourceExportName,
+});
+
+if (!dataSource.isInitialized) {
+  console.log("[Studio] Initializing DataSource...");
+  await dataSource.initialize();
+}
+
+console.log(`[Studio] DataSource initialized. Entities found: ${dataSource.entityMetadatas.length}`);
+dataSource.entityMetadatas.forEach(meta => {
+  console.log(` - Model: ${meta.name} (Table: ${meta.tableName})`);
 });
 
 const server = startStudioServer({
