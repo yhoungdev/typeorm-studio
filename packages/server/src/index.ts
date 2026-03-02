@@ -25,8 +25,10 @@ if (!dataSource.isInitialized) {
   await dataSource.initialize();
 }
 
-console.log(`[Studio] DataSource initialized. Entities found: ${dataSource.entityMetadatas.length}`);
-dataSource.entityMetadatas.forEach(meta => {
+console.log(
+  `[Studio] DataSource initialized. Entities found: ${dataSource.entityMetadatas.length}`,
+);
+dataSource.entityMetadatas.forEach((meta) => {
   console.log(` - Model: ${meta.name} (Table: ${meta.tableName})`);
 });
 

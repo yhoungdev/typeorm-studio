@@ -10,6 +10,7 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Typography } from "@/components/ui/typography";
 import { filterByTerm } from "@/lib/studio";
 import { useStudio } from "@/providers/studio-provider";
 
@@ -26,39 +27,45 @@ export function StudioLayout() {
     <div className="h-screen overflow-hidden bg-background text-foreground">
       <header className="flex h-14 items-center justify-between border-b px-4">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-sm font-semibold">
+          <div className="flex items-center gap-2">
             <Database className="size-4" />
-            TypeORM Studio
+            <Typography variant="small" as="span" className="font-semibold">
+              TypeORM Studio
+            </Typography>
           </div>
           <div className="flex items-center gap-1 rounded-md border p-1">
             <Link
               to="/"
-              className="rounded-sm px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+              className="rounded-sm px-2 py-1"
               activeProps={{
-                className:
-                  "rounded-sm bg-muted px-2 py-1 text-xs text-foreground",
+                className: "rounded-sm bg-muted",
               }}
               activeOptions={{ exact: false, includeSearch: false }}
             >
-              Data
+              <Typography variant="small" as="span" className="text-xs text-muted-foreground hover:text-foreground">
+                Data
+              </Typography>
             </Link>
             <Link
               to="/visualize"
-              className="rounded-sm px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+              className="rounded-sm px-2 py-1"
               activeProps={{
-                className:
-                  "rounded-sm bg-muted px-2 py-1 text-xs text-foreground",
+                className: "rounded-sm bg-muted",
               }}
             >
-              Visualize
+              <Typography variant="small" as="span" className="text-xs text-muted-foreground hover:text-foreground">
+                Visualize
+              </Typography>
             </Link>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground ">
+        <div className="flex items-center gap-2">
           {isLoading && <LoaderCircle className="size-3.5 animate-spin" />}
           {!isLoading && connected && <CircleCheckBig className="size-3.5" />}
           {!isLoading && !connected && <CircleAlert className="size-3.5" />}
-          {isLoading ? "Connecting" : connected ? "Connected" : "Disconnected"}
+          <Typography variant="muted" className="text-xs">
+            {isLoading ? "Connecting" : connected ? "Connected" : "Disconnected"}
+          </Typography>
         </div>
       </header>
 
@@ -80,8 +87,10 @@ export function StudioLayout() {
           ) : null}
 
           {!isLoading && error ? (
-            <div className="rounded-md border border-destructive/40 bg-destructive/5 p-2 text-xs text-destructive">
-              {error}
+            <div className="rounded-md border border-destructive/40 bg-destructive/5 p-2">
+              <Typography variant="muted" className="text-xs text-destructive">
+                {error}
+              </Typography>
             </div>
           ) : null}
 
@@ -95,20 +104,17 @@ export function StudioLayout() {
                   className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted"
                   activeProps={{ className: "bg-muted font-medium" }}
                 >
-                  <span className="flex items-center gap-2">
+                  <Typography variant="small" as="span" className="flex items-center gap-2">
                     <Table2 className="size-3.5" />
                     {model.tableName}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {model.columns.length} cols
-                  </span>
+                  </Typography>
                 </Link>
               ))}
             </div>
           ) : null}
         </aside>
 
-        <main className="overflow-auto p-4">
+        <main className="overflow-auto">
           <Outlet />
         </main>
       </div>

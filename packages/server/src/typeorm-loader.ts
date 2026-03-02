@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { TypeOrmDataSourceLike } from "./adapters/typeorm";
@@ -24,8 +25,17 @@ export async function loadDataSource(
   options: LoadDataSourceOptions,
 ): Promise<TypeOrmDataSourceLike> {
   const absolutePath = resolve(process.cwd(), options.modulePath);
-  const moduleUrl = pathToFileURL(absolutePath).href;
-  const loadedModule = (await import(moduleUrl)) as Record<string, unknown>;
+  let loadedModule: Record<string, unknown>;
+
+  try {
+    // Try CommonJS require first, as it's often more lenient with circular dependencies
+    // especially for projects with "module": "commonjs" in tsconfig
+    loadedModule = require(absolutePath);
+  } catch (e) {
+    // Fallback to ESM import
+    const moduleUrl = pathToFileURL(absolutePath).href;
+    loadedModule = (await import(moduleUrl)) as Record<string, unknown>;
+  }
 
   const exported = loadedModule[options.exportName];
   if (!isDataSourceLike(exported)) {

@@ -19,7 +19,10 @@ export function startStudioServer(config: StudioServerConfig) {
       });
       return server;
     } catch (e: any) {
-      if (e.code === "EADDRINUSE" || e.message?.includes("address already in use")) {
+      if (
+        e.code === "EADDRINUSE" ||
+        e.message?.includes("address already in use")
+      ) {
         console.warn(`Port ${port} is in use, trying ${port + 1}...`);
         port++;
         attempts++;
@@ -29,5 +32,7 @@ export function startStudioServer(config: StudioServerConfig) {
     }
   }
 
-  throw new Error(`Could not find an available port after ${maxAttempts} attempts.`);
+  throw new Error(
+    `Could not find an available port after ${maxAttempts} attempts.`,
+  );
 }

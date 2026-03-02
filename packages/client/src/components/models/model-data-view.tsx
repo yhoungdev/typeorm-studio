@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Typography } from "@/components/ui/typography";
 import { useModelRows } from "@/hooks/use-model-rows";
 import { formatCellValue, rowKey } from "@/lib/studio";
 import { useStudio } from "@/providers/studio-provider";
@@ -19,8 +20,8 @@ import { useStudio } from "@/providers/studio-provider";
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-lg border px-3 py-2">
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="text-lg font-semibold">{value}</div>
+      <Typography variant="muted" className="text-xs">{label}</Typography>
+      <Typography variant="large">{value}</Typography>
     </div>
   );
 }
@@ -40,24 +41,24 @@ export function ModelDataView() {
 
   if (schemaLoading) {
     return (
-      <div className="rounded-lg border p-6 text-sm text-muted-foreground">
-        Loading schema...
+      <div className="rounded-lg border p-6">
+        <Typography variant="muted">Loading schema...</Typography>
       </div>
     );
   }
 
   if (schemaError) {
     return (
-      <div className="rounded-lg border p-6 text-sm text-destructive">
-        {schemaError}
+      <div className="rounded-lg border p-6">
+        <Typography variant="muted" className="text-destructive">{schemaError}</Typography>
       </div>
     );
   }
 
   if (!model) {
     return (
-      <div className="rounded-lg border p-6 text-sm text-muted-foreground">
-        Model not found.
+      <div className="rounded-lg border p-6">
+        <Typography variant="muted">Model not found.</Typography>
       </div>
     );
   }
@@ -72,10 +73,10 @@ export function ModelDataView() {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold">{model.tableName}</h1>
-          <p className="text-sm text-muted-foreground">
+          <Typography variant="h3" as="h1">{model.tableName}</Typography>
+          <Typography variant="muted">
             {data?.total ?? 0} total rows
-          </p>
+          </Typography>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={() => void refresh()}>
@@ -98,91 +99,80 @@ export function ModelDataView() {
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search in rows"
+            placeholder="Search in table..."
           />
 
-          <div className="rounded-lg border">
+          <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
                   {columns.map((column) => (
-                    <TableHead key={column}>{column}</TableHead>
+                    <TableHead key={column}>
+                      <Typography variant="small" as="span" className="font-semibold">{column}</Typography>
+                    </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length || 1}
-                      className="text-center text-sm text-muted-foreground"
-                    >
-                      Loading rows...
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                      <Typography variant="muted">Loading rows...</Typography>
                     </TableCell>
                   </TableRow>
-                ) : null}
-
-                {!isLoading && error ? (
+                ) : error ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length || 1}
-                      className="text-center text-sm text-destructive"
-                    >
-                      {error}
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                      <Typography variant="muted" className="text-destructive">{error}</Typography>
                     </TableCell>
                   </TableRow>
-                ) : null}
-
-                {!isLoading && !error && rows.length === 0 ? (
+                ) : rows.length === 0 ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length || 1}
-                      className="text-center text-sm text-muted-foreground"
-                    >
-                      No rows found.
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                      <Typography variant="muted">No data found.</Typography>
                     </TableCell>
                   </TableRow>
-                ) : null}
-
-                {!isLoading && !error
-                  ? rows.map((row, index) => (
-                      <TableRow
-                        key={rowKey(row, `${model.tableName}-${index}`)}
-                      >
-                        {columns.map((column) => (
-                          <TableCell key={`${index}-${column}`}>
+                ) : (
+                  rows.map((row) => (
+                    <TableRow key={rowKey(row)}>
+                      {columns.map((column) => (
+                        <TableCell key={column}>
+                          <Typography variant="small" as="span" className="font-normal">
                             {formatCellValue(row[column])}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  : null}
+                          </Typography>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
         </section>
 
-        <section className="rounded-lg border p-3">
-          <h2 className="mb-3 text-sm font-semibold">Schema</h2>
-          <div className="space-y-2">
-            {model.columns.map((column) => (
-              <div
-                key={column.name}
-                className="flex items-center justify-between rounded-md border px-3 py-2 text-sm"
-              >
-                <div>
-                  <div className="font-medium">{column.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {column.type}
+        <aside className="space-y-4">
+          <section className="rounded-lg border p-4">
+            <Typography variant="large" className="mb-4">Model Details</Typography>
+            <div className="space-y-3">
+              {model.columns.map((column) => (
+                <div key={column.name} className="flex items-center justify-between border-b pb-2 last:border-0">
+                  <div className="space-y-0.5">
+                    <Typography variant="small" className="font-semibold">{column.name}</Typography>
+                    <Typography variant="muted" className="text-[10px] uppercase tracking-wider">{column.type}</Typography>
+                  </div>
+                  <div className="flex gap-1">
+                    {column.isPrimary && (
+                      <div className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary uppercase">PK</div>
+                    )}
+                    {column.nullable && (
+                      <div className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground uppercase">Null</div>
+                    )}
                   </div>
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  {column.nullable ? "nullable" : "required"}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+              ))}
+            </div>
+          </section>
+        </aside>
       </div>
     </div>
   );
