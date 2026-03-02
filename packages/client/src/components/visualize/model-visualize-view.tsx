@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import {
   Background,
   Controls,
@@ -11,28 +11,35 @@ import {
   useEdgesState,
   addEdge,
   BackgroundVariant,
+  Panel,
+  useReactFlow,
   type Edge,
   type Node,
   type NodeProps,
   type Connection,
 } from "@xyflow/react";
-import { Table2, Hash, Database } from "lucide-react";
+import { Table2, Hash, Database, X, ZoomIn, Info } from "lucide-react";
 import "@xyflow/react/dist/style.css";
 
 import { relationTargetModel } from "@/lib/studio";
 import type { StudioModel } from "@/lib/types";
 import { useStudio } from "@/providers/studio-provider";
 import { Typography } from "@/components/ui/typography";
+import { Button } from "@/components/ui/button";
 
 type ModelNodeData = Node<{
   model: StudioModel;
 }, "modelNode">;
 
-function ModelNode({ data }: NodeProps<ModelNodeData>) {
+interface ModelNodeProps extends NodeProps<ModelNodeData> {
+  selected?: boolean;
+}
+
+function ModelNode({ data, selected }: ModelNodeProps) {
   const { model } = data;
 
   return (
-    <div className="group relative">
+    <div className={`group relative ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background rounded-xl' : ''}`}>
       <Handle
         type="target"
         position={Position.Left}
@@ -44,7 +51,7 @@ function ModelNode({ data }: NodeProps<ModelNodeData>) {
         className="!size-2.5 !border-2 !border-background !bg-primary transition-transform group-hover:scale-125"
       />
 
-      <div className="min-w-56 overflow-hidden rounded-xl border-2 bg-card shadow-xl transition-all group-hover:border-primary/50 group-hover:shadow-primary/10">
+      <div className={`min-w-56 overflow-hidden rounded-xl border-2 bg-card shadow-xl transition-all ${selected ? 'border-primary shadow-primary/20' : 'group-hover:border-primary/50 group-hover:shadow-primary/10'}`}>
         <div className="flex items-center gap-1 bg-primary px-3 py-2.5 border-b">
           <div className="flex size-6 items-center justify-center rounded bg-primary/10 text-primary">
             <Table2 className="size-3.5" color="white"/>
@@ -130,8 +137,71 @@ function createEdges(models: StudioModel[]): Edge[] {
   return edges;
 }
 
+// Node Details Panel Component
+function NodeDetailsPanel({ 
+  node, 
+  onClose 
+}: { 
+  node: ModelNodeData | null; 
+  onClose: () => void;
+}) {
+  if (!node) return null;
+  
+  const { model } = node.data;
+  
+  return (
+    <div className="absolute top-4 right-4 z-10 w-72 rounded-xl border-2 bg-card/95 backdrop-blur-sm shadow-xl">
+      <div className="flex items-center justify-between border-b px-4 py-3">
+        <div className="flex items-center gap-2">
+          <Table2 className="size-4 text-primary" />
+          <Typography className="font-semibold">{model.name}</Typography>
+        </div>
+        <Button variant="ghost" size="icon" className="size-6" onClick={onClose}>
+          <X className="size-4" />
+        </Button>
+      </div>
+      
+      <div className="max-h-64 overflow-auto p-4 space-y-4">
+        <div>
+          <Typography variant="muted" className="text-xs font-bold uppercase tracking-wider mb-2">
+            Columns ({model.columns.length})
+          </Typography>
+          <div className="space-y-1">
+            {model.columns.map((col) => (
+              <div key={col.name} className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  {col.isPrimary && <Hash className="size-3 text-primary" />}
+                  <span className={col.isPrimary ? "font-semibold" : ""}>{col.name}</span>
+                </div>
+                <span className="text-xs text-muted-foreground font-mono">{col.type}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {model.relations.length > 0 && (
+          <div>
+            <Typography variant="muted" className="text-xs font-bold uppercase tracking-wider mb-2">
+              Relations ({model.relations.length})
+            </Typography>
+            <div className="space-y-1">
+              {model.relations.map((rel, idx) => (
+                <div key={idx} className="text-sm text-muted-foreground">
+                  {rel.field} → {rel.references}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function ModelVisualizeInner() {
   const { models, isLoading, error } = useStudio();
+  const [selectedNode, setSelectedNode] = useState<ModelNodeData | null>(null);
+  const { fitView } = useReactFlow();
 
   const initialNodes = useMemo(() => createNodes(models), [models]);
   const initialEdges = useMemo(() => createEdges(models), [models]);
@@ -143,6 +213,14 @@ function ModelVisualizeInner() {
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
   );
+
+  const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
+    setSelectedNode(node as ModelNodeData);
+  }, []);
+
+  const handleZoomToFit = useCallback(() => {
+    fitView({ padding: 0.2, duration: 800 });
+  }, [fitView]);
 
   if (isLoading) {
     return (
@@ -172,13 +250,14 @@ function ModelVisualizeInner() {
   }
 
   return (
-    <div className="h-full w-full bg-[#f8f9fa]">
+    <div className="h-full w-full bg-muted/30">
       <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         fitView
         snapToGrid
@@ -193,13 +272,48 @@ function ModelVisualizeInner() {
           size={1} 
           color="rgba(0,0,0,0.05)" 
         />
-        <Controls className="!bg-card !border-2 !shadow-xl !rounded-xl" />
+        <Controls className="!bg-card !border-2 !shadow-xl !rounded-xl">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="border-b rounded-none h-8 w-8"
+            onClick={handleZoomToFit}
+            title="Zoom to fit"
+          >
+            <ZoomIn className="size-4" />
+          </Button>
+        </Controls>
         <MiniMap 
           className="!bg-card !border-2 !shadow-xl !rounded-xl" 
           nodeColor="#eee"
           maskColor="rgba(255, 255, 255, 0.7)"
         />
+        
+        {/* Custom Toolbar Panel */}
+        <Panel position="top-left" className="m-4">
+          <div className="flex items-center gap-2 rounded-xl border-2 bg-card/95 backdrop-blur-sm px-3 py-2 shadow-lg">
+            <Database className="size-4 text-primary" />
+            <Typography className="text-sm font-semibold">
+              {models.length} Tables
+            </Typography>
+            {selectedNode && (
+              <>
+                <div className="w-px h-4 bg-border mx-1" />
+                <Info className="size-4 text-primary" />
+                <Typography className="text-xs text-muted-foreground">
+                  Click table for details
+                </Typography>
+              </>
+            )}
+          </div>
+        </Panel>
       </ReactFlow>
+
+      {/* Node Details Panel */}
+      <NodeDetailsPanel 
+        node={selectedNode} 
+        onClose={() => setSelectedNode(null)} 
+      />
     </div>
   );
 }
