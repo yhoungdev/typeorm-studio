@@ -22,6 +22,9 @@ export function createStudioHandler(rawConfig: StudioApiConfig) {
   const cors = corsHeaders(config);
 
   return async function studioHandler(req: Request): Promise<Response> {
+    const url = new URL(req.url);
+    console.log(`[Studio] ${req.method} ${url.pathname}${url.search}`);
+    
     try {
       if (req.method === "OPTIONS") {
         return noContent({ headers: cors });
@@ -63,6 +66,7 @@ export function createStudioHandler(rawConfig: StudioApiConfig) {
 
       if (internalPath === "/schema" || internalPath === "/models") {
         const schema = await config.provider.getSchema();
+        console.log(`[Studio] Fetched schema: ${schema.models.length} models found.`);
         return json(schema, { headers: cors });
       }
 
@@ -72,6 +76,7 @@ export function createStudioHandler(rawConfig: StudioApiConfig) {
       ) {
         const tableName = getTableName(internalPath);
         const shape = await config.provider.getModelShape(tableName);
+        console.log(`[Studio] Fetched shape for table: ${tableName}`);
         return json(shape, { headers: cors });
       }
 
@@ -97,7 +102,7 @@ export function createStudioHandler(rawConfig: StudioApiConfig) {
           offset,
           search,
         });
-
+        console.log(`[Studio] Fetched ${payload.rows.length}/${payload.total} rows for table: ${tableName}`);
         return json(payload, { headers: cors });
       }
 
